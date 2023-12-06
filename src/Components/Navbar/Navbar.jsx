@@ -26,7 +26,7 @@ const NavigationBar = () => {
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto" activeKey={activeKey} onSelect={(selectedKey) => setActiveKey(selectedKey)}>
-                        <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>Catálogo</Link>
+                        <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>Inicio</Link>
                         <Link to="/libros" className={`nav-link ${isActive('/libros') ? 'active' : ''}`}>Libros</Link>
                         <Link to="/multimedia" className={`nav-link ${isActive('/multimedia') ? 'active' : ''}`}>Multimedia</Link>
                         <Link to="/perfil" className={`nav-link ${isActive('/perfil') ? 'active' : ''}`}>Perfil</Link>
