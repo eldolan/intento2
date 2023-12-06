@@ -1,0 +1,11 @@
+.loginsignup-container span {
+    cursor: pointer;
+    font-weight: 600;
+}
+.btn-primary {
+    background-color: #862F2F;
+    border-color: rgba(37, 37, 37, 0.2);
+}
+.loginsignup{
+    background: linear-gradient(180deg, #865B2F, #e1ffea22 60%);
+}

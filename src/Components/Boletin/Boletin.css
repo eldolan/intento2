@@ -1,0 +1,6 @@
+/* Ajustes personalizados para el newsletter */
+.newsletter {
+    background: linear-gradient(180deg, #fde1ff 0%, #e1ffea22 60%);
+}
+
+/* El resto del estilo se maneja con clases de Bootstrap */

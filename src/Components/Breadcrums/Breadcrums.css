@@ -1,0 +1,6 @@
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: url('../Assets/breadcrum_arrow.png');
+    padding: 0 8px;
+}
+

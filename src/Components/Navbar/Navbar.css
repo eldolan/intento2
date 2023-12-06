@@ -1,0 +1,61 @@
+/* Ajusta los estilos de Bootstrap a tu diseño específico */
+.navbar {
+    background-color: #862F2F!important;
+    font-family: 'Poppins', sans-serif;
+}
+
+.responsive{
+    max-width: 100%;
+    height: auto;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    color: white!important;
+}
+
+.navbar-nav .nav-link {
+    color: #626262!important;
+    font-size: 20px;
+    font-weight: 500;
+    margin-right: 20px;
+}
+
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link:focus {
+    color: white!important;
+    border-bottom: 3px solid white;
+    padding-bottom: calc(0.5rem - 3px);
+}
+
+.navbar-nav .nav-link:hover {
+    color: white!important;
+}
+
+
+.btn-outline-secondary {
+    color: #c1c1c7;
+    border-color: #c1c1c7;
+    border-radius: 75px;
+}
+
+.btn-outline-secondary:hover {
+    background-color: rgba(33, 37, 41, 0.27);
+}
+
+
+.cart-count {
+    position: relative;
+    top: -12px;
+    right: -10px;
+    background-color: #54545a;
+    color: #e2e2e5;
+    border-radius: 50%;
+    padding: 0 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    vertical-align: super;
+    text-decoration: none;
+}
+
+

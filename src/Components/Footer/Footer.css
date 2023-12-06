@@ -1,0 +1,25 @@
+
+.footer {
+    background-color: #862F2F;
+}
+
+.footer-logo {
+    height: 50px;
+}
+
+.footer-logo-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.social-icon {
+    filter: invert(1);
+    width: 30px;
+}
+
+.hr {
+    border-color: #c7c7c7;
+    max-width: 80%;
+    margin: auto;
+}
+
