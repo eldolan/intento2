@@ -20,6 +20,7 @@ const formatDate = (date) => {
 };
 
 const ShopContextProvider = (props) => {
+    const [solicitudes, setSolicitudes] = useState([]);
     const [userProfile, setUserProfile] = useState(null);
     const [products, setProducts] = useState(all_product);
     console.log("Productos iniciales:", all_product);
@@ -29,8 +30,9 @@ const ShopContextProvider = (props) => {
         const token = localStorage.getItem('auth-token');
         if (token) {
             fetchUserProfile(token);
+            fetchProducts();
+            fetchSolicitudes(token);
         }
-        fetchProducts();
     }, []);
 
     const fetchUserProfile = async () => {
@@ -174,17 +176,36 @@ const ShopContextProvider = (props) => {
         }
     };
 
+    const fetchSolicitudes = async (token) => {
+        try {
+            const respuesta = await fetch('/api/solicitudes', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!respuesta.ok) {
+                throw new Error('Error al cargar las solicitudes');
+            }
+            const data = await respuesta.json();
+            setSolicitudes(data);
+        } catch (error) {
+            console.error("Error al cargar solicitudes:", error);
+        }
+    };
 
-    const contextValue = {
-        products,
-        getTotalCartItems,
-        cartItems,
-        addToCart,
-        removeFromCart,
-        getTotalCartAmount,
-        updateCartQuantity,
-        userProfile,
-        fetchUserProfile
+
+
+        const contextValue = {
+            products,
+            getTotalCartItems,
+            cartItems,
+            addToCart,
+            removeFromCart,
+            getTotalCartAmount,
+            updateCartQuantity,
+            userProfile,
+            fetchUserProfile,
+            solicitudes
     };
     return (
         <ShopContext.Provider value={contextValue}>

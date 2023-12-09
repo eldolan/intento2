@@ -5,7 +5,7 @@ import EditProfileModal from './ModalPerfil';
 import { ShopContext } from '../../Context/ShopContext';
 
 const Perfil = () => {
-    const { userProfile, fetchUserProfile } = useContext(ShopContext); // Usar ShopContext
+    const { userProfile, fetchUserProfile } = useContext(ShopContext);
     const [error, setError] = useState(null);
     const [perfil, setPerfil] = useState({
         username: '',
@@ -14,7 +14,7 @@ const Perfil = () => {
         rut: '',
         phone: '',
         address: ''
-    }); // Estado para gestionar el perfil
+    })
     const [showModal, setShowModal] = useState(false);
 
     const handleOpenModal = () => setShowModal(true);
@@ -27,7 +27,7 @@ const Perfil = () => {
                 setError(err.message);
             });
         } else {
-            setPerfil(userProfile); // Actualizar estado con datos del userProfile
+            setPerfil(userProfile);
         }
     }, [userProfile, fetchUserProfile]);
 
@@ -38,7 +38,7 @@ const Perfil = () => {
         });
     };
 
-        const [newEmail, setNewEmail] = useState('');
+        const [newEmail] = useState('');
 
             const handleSubmit = async () => {
                 const updatedProfile = { ...perfil, correo: newEmail };
