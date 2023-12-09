@@ -4,42 +4,44 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar from "./Components/Navbar/Navbar";
 import './Components/Navbar/Navbar.css';
 import{BrowserRouter,Routes,Route} from "react-router-dom";
+import Admin from './Admin/Admin'
 import Shop from "./Pages/Shop";
 import ShopCategory from "./Pages/ShopCategory";
 import Product from "./Pages/Product";
 import Cart from "./Pages/Cart";
 import LoginSignup from "./Pages/LoginSignup";
 import Footer from "./Components/Footer/Footer";
-import men_banner from './Components/Assets/banner_mens.png'
-import women_banner from './Components/Assets/banner_women.png'
-import kid_banner from './Components/Assets/banner_kids.png'
+import Perfil from "./Components/Perfil/Perfil";
+import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute"
+import banner_libros from './Components/Assets/banner_libros.png'
+import banner_multimedia from './Components/Assets/banner_multimedia.png'
+import CheckoutPage from "./Components/Checkout/Checkout";
 
 
 function App() {
-  return (
-    <div>
-        <BrowserRouter>
-            {/*Navbar Global*/}
-            <Navbar/>
-            {/*Conexion entre las paginas*/}
-            <Routes>
-                <Route path='/' element={<Shop/>}/>
-                <Route path='/libros' element={<ShopCategory banner={men_banner} category="libros"/>}/>
-                <Route path='/multimedia' element={<ShopCategory banner={women_banner} category="multimedia"/>}/>
-                <Route path='/perfil' element={<ShopCategory banner={kid_banner} category="perfil"/>}/>
-                <Route path="/product" element={<Product/>}>
-                    <Route path='productId' element={<Product/>}/>
-                </Route>
-            <Route path='/cart' element={<Cart/>}/>
-            <Route path='/login' element={<LoginSignup/>}/>
-            </Routes>
-            {/*Footer Global*/}
-            <Footer/>
-        </BrowserRouter>
+    return (
+        <div>
+            <BrowserRouter>
+                <Navbar/>
 
+                <Routes>
+                    <Route path='/' element={<Shop/>}/>
+                    <Route path='/libros' element={<ShopCategory banner={banner_libros} category="libros"/>}/>
+                    <Route path='/multimedia' element={<ShopCategory banner={banner_multimedia} category="multimedia"/>}/>
+                    <Route path='/perfil' element={<ProtectedRoute><Perfil/></ProtectedRoute>}/>
+                    <Route path="/product" element={<Product/>}>
+                        <Route path='/product/:id' element={<Product/>}/>
+                    </Route>
+                    <Route path='/carrito' element={<Cart/>}/>
+                    <Route path="/checkout" element={<CheckoutPage />} />
+                    <Route path='/login' element={<LoginSignup/>}/>
+                    <Route path="/admin" element={<Admin/>}/>
+                </Routes>
 
-    </div>
-  );
+                <Footer/>
+            </BrowserRouter>
+        </div>
+    );
 }
 
 export default App;

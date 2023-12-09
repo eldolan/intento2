@@ -1,0 +1,10 @@
+.carrito-container{
+    background: linear-gradient(180deg, #865B2F, #e1ffea22 60%);
+    width: 100%;
+    min-height: 75vh;
+}
+
+.carrito-container hr {
+    height: 2px;
+    background-color: black;
+}

@@ -1,23 +1,32 @@
-import React, { useContext } from 'react'
-import Breadcrums from '../Components/Breadcrums/Breadcrums'
-import PaginaProducto from '../Components/PaginaProducto/PaginaProducto'
-import DescriptionBox from '../Components/Descripcion/Descripcion.css'
-import RelatedProducts from '../Components/RelatedProducts/RelatedProducts'
-import { useParams } from 'react-router-dom'
-import { ShopContext } from '../Context/ShopContext'
+import React, { useContext } from 'react';
+import { useParams } from 'react-router-dom';
+import { ShopContext } from '../Context/ShopContext';
+import './CSS/Product.css'
+import Breadcrums from '../Components/Breadcrums/Breadcrums';
+import PaginaProducto from '../Components/PaginaProducto/PaginaProducto';
+import Descripcion from '../Components/Descripcion/Descripcion';
+import RelatedProducts from '../Components/RelatedProducts/RelatedProducts';
 
 const Product = () => {
-    const {products} = useContext(ShopContext);
-    const {productId} = useParams();
-    const product = products.find((e)=>e.id === productId);
+    const { id } = useParams();
+    console.log("ID del producto desde URL:", id);
+    const { products } = useContext(ShopContext);
+    console.log("Productos disponibles:", products);
+    const product = products.find((product) => product.id === parseInt(id, 10));
+    console.log("Producto encontrado:", product);
+    if (!product) {
+        console.log("Producto no encontrado para el ID:", id);
+        return <div>Producto no encontrado</div>;
+    }
+
     return (
-        <div>
+        <div className="product">
             <Breadcrums product={product}/>
             <PaginaProducto product={product}/>
-            <DescriptionBox/>
+            <Descripcion/>
             <RelatedProducts/>
         </div>
-    )
-}
+    );
+};
 
-export default Product
+export default Product;

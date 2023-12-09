@@ -2,19 +2,31 @@ import React, { useState } from 'react';
 import { Container, Nav, Navbar, Button } from 'react-bootstrap';
 import logo from '../Assets/logo.png';
 import cart_icon from '../Assets/cart_icon.png';
-import { Link, useLocation } from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 
 
 const NavigationBar = () => {
     const [activeKey, setActiveKey] = useState('catalogo');
     const location = useLocation();
+    const navigate = useNavigate();
+
+    const isAuthenticated = () => {
+        return localStorage.getItem('auth-token') !== null;
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('auth-token');
+        navigate('/login');
+    };
+
     const isActive = (path) => location.pathname === path;
+
 
     return (
         <Navbar collapseOnSelect expand="lg" bg="light" variant="light" className="shadow-lg p-3 bg-white rounded-bottom-1">
             <Container fluid>
-                <Navbar.Brand href="#home" className="d-flex align-items-center ms-3">
+                <Navbar.Brand href="/" className="d-flex align-items-center ms-3">
                     <img
                         alt="Logo"
                         src={logo}
@@ -33,9 +45,8 @@ const NavigationBar = () => {
                     </Nav>
                 </Navbar.Collapse>
                 <div className="d-flex align-items-center ms-auto">
-                    <NavLink to='/login'>
-                        <Button variant="outline-secondary" className="me-2">Iniciar Sesión</Button>
-                    </NavLink>
+                    {isAuthenticated() ? (<Button variant="outline-secondary" onClick={handleLogout}>Cerrar Sesión</Button>) :
+                        (<NavLink to='/login'><Button variant="outline-secondary" className="me-2">Iniciar Sesión</Button></NavLink>)}
                     <Navbar.Text>
                         <NavLink to='/carrito'>
                             <img

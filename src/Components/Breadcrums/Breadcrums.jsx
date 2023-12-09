@@ -1,19 +1,15 @@
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import Breadcrumb from 'react-bootstrap/Breadcrumb';
 import './Breadcrums.css';
-
 
 const Breadcrums = (props) => {
     const { product } = props;
     return (
-        <nav aria-label="breadcrumb" className="my-4">
-            <ol className="breadcrumb">
-                <li className="breadcrumb-item"><a href="/">Home</a></li>
-                <li className="breadcrumb-item"><a href="/shop">Shop</a></li>
-                <li className="breadcrumb-item active" aria-current="page">{product.category}</li>
-                <li className="breadcrumb-item active" aria-current="page">{product.name}</li>
-            </ol>
-        </nav>
+        <Breadcrumb aria-label="breadcrumb" className="breacrum-container p-3">
+            <Breadcrumb.Item href="/">Inicio</Breadcrumb.Item>
+            <Breadcrumb.Item active>{product.category}</Breadcrumb.Item>
+            <Breadcrumb.Item active>{product.name}</Breadcrumb.Item>
+        </Breadcrumb>
     );
 }
 

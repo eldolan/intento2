@@ -1,6 +1,6 @@
 import React from "react";
 import './Popular.css';
-import data_product from "../Assets/data";
+import data_product from "../Assets/masvendidos";
 import Item from "../Item/Item";
 
 const Popular = () => {
@@ -9,9 +9,9 @@ const Popular = () => {
             <h1 className="mt-5">MÁS VENDIDOS</h1>
             <hr className="my-4" />
             <div className="row justify-content-center">
-                {data_product.map((item, i) => {
-                    return <Item id={item.id} name={item.name} image={item.image} new_price={item.new_price} old_price={item.old_price}/>;
-                })}
+                {data_product.map((item) => (
+                    <Item key={item.id} {...item} />
+                ))}
             </div>
         </div>
     )
