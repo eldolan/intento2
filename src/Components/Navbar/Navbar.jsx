@@ -1,25 +1,37 @@
-import React, { useState } from 'react';
-import { Container, Nav, Navbar, Button } from 'react-bootstrap';
+import React, {useState, useEffect, useContext} from 'react';
+import {Container, Nav, Navbar, Button, NavLink} from 'react-bootstrap';
 import logo from '../Assets/logo.png';
 import cart_icon from '../Assets/cart_icon.png';
-import {Link, useLocation, useNavigate} from 'react-router-dom';
-import { NavLink } from 'react-router-dom';
-
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ShopContext } from '../../Context/ShopContext';
 
 const NavigationBar = () => {
     const [activeKey, setActiveKey] = useState('catalogo');
+    const { isUserAuthenticated, setIsUserAuthenticated } = useContext(ShopContext);
     const location = useLocation();
     const navigate = useNavigate();
 
-    const isAuthenticated = () => {
-        return localStorage.getItem('auth-token') !== null;
-    };
+    useEffect(() => {
+        const userId = localStorage.getItem('userId');
+        setIsUserAuthenticated(!!userId);
+    }, []);
 
-    const handleLogout = () => {
-        localStorage.removeItem('auth-token');
-        navigate('/login');
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('http://localhost:4000/logout', {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if (response.ok) {
+                localStorage.removeItem('userToken');
+                setIsUserAuthenticated(false);
+                localStorage.removeItem('userId');
+                navigate('/');
+            }
+        } catch (error) {
+            console.error('Error al cerrar sesión', error);
+        }
     };
-
     const isActive = (path) => location.pathname === path;
 
 
@@ -45,10 +57,13 @@ const NavigationBar = () => {
                     </Nav>
                 </Navbar.Collapse>
                 <div className="d-flex align-items-center ms-auto">
-                    {isAuthenticated() ? (<Button variant="outline-secondary" onClick={handleLogout}>Cerrar Sesión</Button>) :
-                        (<NavLink to='/login'><Button variant="outline-secondary" className="me-2">Iniciar Sesión</Button></NavLink>)}
+                    {isUserAuthenticated ? (
+                        <Button variant="outline-secondary" onClick={handleLogout}>Cerrar Sesión</Button>
+                    ) : (
+                        <Link to='/login' className="btn btn-outline-secondary me-2">Iniciar Sesión</Link>
+                    )}
                     <Navbar.Text>
-                        <NavLink to='/carrito'>
+                        <Nav.Link as={Link} to='/carrito'>
                             <img
                                 alt="Carrito"
                                 src={cart_icon}
@@ -56,7 +71,7 @@ const NavigationBar = () => {
                                 height="30"
                                 className="d-inline-block align-top"
                             />
-                        </NavLink>
+                        </Nav.Link>
                         <span className="cart-count">0</span>
                     </Navbar.Text>
                 </div>

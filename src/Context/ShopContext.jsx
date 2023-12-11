@@ -1,5 +1,7 @@
 import React, { createContext, useEffect, useState } from "react";
 import all_product from '../Components/Assets/all_product';
+import axios from "axios";
+
 export const ShopContext = createContext(null);
 
 const getDefaultCart = () => {
@@ -23,41 +25,64 @@ const ShopContextProvider = (props) => {
     const [solicitudes, setSolicitudes] = useState([]);
     const [userProfile, setUserProfile] = useState(null);
     const [products, setProducts] = useState(all_product);
-    console.log("Productos iniciales:", all_product);
     const [cartItems, setCartItems] = useState(getDefaultCart());
+    const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+
 
     useEffect(() => {
-        const token = localStorage.getItem('auth-token');
-        if (token) {
-            fetchUserProfile(token);
-            fetchProducts();
-            fetchSolicitudes(token);
-        }
+        const checkAuth = () => {
+            const userId = localStorage.getItem('userId');
+            setIsUserAuthenticated(!!userId);
+        };
+        checkAuth();
+        window.addEventListener('storage', checkAuth);
+
+        return () => {
+            window.removeEventListener('storage', checkAuth);
+        };
     }, []);
 
+
+    useEffect(() => {
+        fetchUserProfile();
+        fetchProducts();
+    }, []);
+
+    useEffect(() => {
+        console.log("Estado del carrito ha sido actualizado:", cartItems);
+    }, [cartItems]);
+
     const fetchUserProfile = async () => {
-        const token = localStorage.getItem('auth-token');
-        if (!token) {
-            console.error("Token no encontrado");
-            return;
-        }
-
         try {
-            const response = await fetch('http://localhost:4000/perfil', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Error al cargar el perfil del usuario.');
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                throw new Error('No hay usuario autenticado');
             }
 
-            const data = await response.json();
-            setUserProfile(data);
+            const response = await axios.get(`http://localhost:4000/perfil?userId=${userId}`, {
+                withCredentials: true,
+            });
+
+            setUserProfile(response.data);
         } catch (error) {
-            console.error("Error en fetchUserProfile:", error);
+            console.error("Error en fetchUserProfile:", error.response.data);
+        }
+    };
+
+    const updateProfile = async (userId, newEmail, newPassword, currentPassword, updatedData) => {
+        try {
+            const response = await fetch('http://localhost:4000/perfil/update', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, newEmail, newPassword, currentPassword, updatedData })
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Error al actualizar el perfil');
+            }
+            setUserProfile(data.user);
+        } catch (error) {
+            console.error("Error en updateProfile:", error);
         }
     };
 
@@ -73,6 +98,7 @@ const ShopContextProvider = (props) => {
             console.error('Error al cargar productos desde la API:', error);
         }
     };
+
 
     const getTotalCartAmount = () => {
         let totalAmount = 0;
@@ -96,92 +122,75 @@ const ShopContextProvider = (props) => {
         return totalItem;
     };
 
-    const addToCart = (itemId, option = 'Compra', startDate = null) => {
-        setCartItems(prev => {
-            const itemExists = prev[itemId];
-            let returnDate = null;
+    const fetchCartItems = async () => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) return;
 
-            if (option === 'Arriendo' && startDate) {
-                const returnDateObj = new Date(startDate);
-                returnDateObj.setDate(returnDateObj.getDate() + 7);
-                returnDate = formatDate(returnDateObj);
+        try {
+            const response = await axios.get(`http://localhost:4000/getcart/${userId}`);
+            if (response.data) {
+                // Convertir el objeto a la estructura esperada
+                const newCartItems = {};
+                for (const [key, value] of Object.entries(response.data)) {
+                    newCartItems[key] = { quantity: value };
+                }
+                setCartItems(newCartItems);
             }
-
-            if (itemExists) {
-                return { ...prev, [itemId]: { ...itemExists, quantity: itemExists.quantity + 1, option, startDate, returnDate } };
-            } else {
-                return { ...prev, [itemId]: { quantity: 1, option, startDate, returnDate } };
-            }
-        });
-        if(localStorage.getItem("auth-token")) {
-            fetch('http://localhost:4000/addtocart', {
-                method: 'POST',
-                headers: {
-                    Accept:'application/form-data',
-                    'auth-token':`${localStorage.getItem("auth-token")}`,
-                    'Content-Type':'application/json',
-                },
-                body: JSON.stringify({"itemId": itemId}),
-            })
-                .then((resp) => resp.json())
-                .then((data) => { console.log(data); });
+        } catch (error) {
+            console.error("Error al obtener los datos del carrito:", error);
         }
     };
 
-    const removeFromCart = (itemId) => {
-        setCartItems(prev => {
-            const itemExists = prev[itemId];
-            if (itemExists && itemExists.quantity > 1) {
-                return { ...prev, [itemId]: { ...itemExists, quantity: itemExists.quantity - 1 } };
-            } else {
-                const updatedCart = { ...prev };
-                delete updatedCart[itemId];
-                return updatedCart;
+
+
+    const addToCart = async (itemId, option, startDate) => {
+        const userId = localStorage.getItem('userId');
+        try {
+            const response = await axios.post('http://localhost:4000/addtocart', {
+                userId,
+                itemId,
+                quantity: 1,
+                option,
+                startDate
+            });
+            console.log(response.data);
+            if (response.data) {
+                await fetchCartItems();
             }
-        });
-        if(localStorage.getItem("auth-token")) {
-            fetch('http://localhost:4000/removefromcart', {
-                method: 'POST',
-                headers: {
-                    Accept:'application/form-data',
-                    'auth-token':`${localStorage.getItem("auth-token")}`,
-                    'Content-Type':'application/json',
-                },
-                body: JSON.stringify({"itemId": itemId}),
-            })
-                .then((resp) => resp.json())
-                .then((data) => { console.log(data); });
-        }
-    };
-    const updateCartQuantity = (newQuantity, itemId) => {
-        setCartItems(prev => {
-            const itemExists = prev[itemId];
-            if (itemExists) {
-                return { ...prev, [itemId]: { ...itemExists, quantity: Math.max(newQuantity, 0) } };
-            }
-            return prev;
-        });
-        if(localStorage.getItem("auth-token")) {
-            fetch('http://localhost:4000/addtocart', {
-                method: 'POST',
-                headers: {
-                    Accept:'application/form-data',
-                    'auth-token':`${localStorage.getItem("auth-token")}`,
-                    'Content-Type':'application/json',
-                },
-                body: JSON.stringify({"itemId": itemId}),
-            })
-                .then((resp) => resp.json())
-                .then((data) => { console.log(data); });
+        } catch (error) {
+            console.error("Error al añadir al carrito:", error);
         }
     };
 
-    const fetchSolicitudes = async (token) => {
+    const removeFromCart = async (itemId) => {
+        const userId = localStorage.getItem('userId');
+        try {
+            const response = await axios.post('http://localhost:4000/removefromcart', { userId, itemId });
+            if (response.data) {
+            }
+        } catch (error) {
+            console.error("Error al eliminar del carrito:", error);
+        }
+    };
+    const updateCartQuantity = async (itemId, newQuantity) => {
+        const userId = localStorage.getItem('userId');
+        try {
+            const response = await axios.post('http://localhost:4000/updatecartquantity', {
+                userId,
+                itemId,
+                quantity: newQuantity
+            });
+            if (response.data) {
+            }
+        } catch (error) {
+            console.error("Error al actualizar la cantidad en el carrito:", error);
+        }
+    };
+
+    const fetchSolicitudes = async () => {
         try {
             const respuesta = await fetch('/api/solicitudes', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                credentials: 'include',
             });
             if (!respuesta.ok) {
                 throw new Error('Error al cargar las solicitudes');
@@ -195,17 +204,22 @@ const ShopContextProvider = (props) => {
 
 
 
-        const contextValue = {
-            products,
-            getTotalCartItems,
-            cartItems,
-            addToCart,
-            removeFromCart,
-            getTotalCartAmount,
-            updateCartQuantity,
-            userProfile,
-            fetchUserProfile,
-            solicitudes
+
+    const contextValue = {
+        products,
+        getTotalCartItems,
+        cartItems,
+        addToCart,
+        removeFromCart,
+        getTotalCartAmount,
+        updateCartQuantity,
+        userProfile,
+        fetchUserProfile,
+        fetchSolicitudes,
+        solicitudes,
+        isUserAuthenticated,
+        setIsUserAuthenticated,
+        updateProfile
     };
     return (
         <ShopContext.Provider value={contextValue}>

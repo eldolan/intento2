@@ -36,7 +36,8 @@ const CartItems = () => {
                                         type="number"
                                         value={item.quantity}
                                         className="form-control"
-                                        onChange={(e) => updateCartQuantity(e.target.value, e.id)} // Usa la función aquí
+                                        onChange={(e) => updateCartQuantity(e.id, parseInt(e.target.value))}
+                                        // Usa la función aquí
                                     />
                                 </div>
                                 <div className="col">${e.new_price * item.quantity}</div>
