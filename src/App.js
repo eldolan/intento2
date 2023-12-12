@@ -15,7 +15,6 @@ import Perfil from "./Components/Perfil/Perfil";
 import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute"
 import banner_libros from './Components/Assets/banner_libros.png'
 import banner_multimedia from './Components/Assets/banner_multimedia.png'
-import CheckoutPage from "./Components/Checkout/Checkout";
 
 
 function App() {
@@ -38,7 +37,6 @@ function App() {
                         </ProtectedRoute>
                     }/>
                     <Route path='/carrito' element={<Cart/>}/>
-                    <Route path="/checkout" element={<CheckoutPage />} />
                     <Route path='/login' element={<LoginSignup/>}/>
                     <Route path="/admin" element={<Admin/>}/>
                 </Routes>

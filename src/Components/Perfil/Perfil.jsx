@@ -7,8 +7,9 @@ import {useNavigate} from "react-router-dom";
 
 const Perfil = () => {
     const navigate = useNavigate();
-    const { userProfile, fetchUserProfile, isUserAuthenticated } = useContext(ShopContext);
+    const { userProfile, fetchUserProfile, isUserAuthenticated, fetchSolicitudes } = useContext(ShopContext);
     const [showModal, setShowModal] = useState(false);
+    const [solicitudes, setSolicitudes] = useState([]);
 
     useEffect(() => {
         if (!isUserAuthenticated) {
@@ -19,6 +20,33 @@ const Perfil = () => {
             });
         }
     }, [userProfile, fetchUserProfile, isUserAuthenticated, navigate]);
+
+    useEffect(() => {
+        if (isUserAuthenticated && userProfile) {
+            const fetchSolicitudesUsuario = async () => {
+                try {
+                    const response = await fetch(`/api/solicitudes/usuario/${userProfile._id}`, {
+                        credentials: 'include',
+                    });
+                    if (!response.ok) {
+                        throw new Error('Error al cargar las solicitudes');
+                    }
+                    const data = await response.json();
+                    setSolicitudes(data);
+                } catch (error) {
+                    console.error("Error al cargar solicitudes:", error);
+                }
+            };
+
+            fetchSolicitudesUsuario();
+        }
+    }, [userProfile, isUserAuthenticated]);
+
+
+    if (userProfile) {
+        fetchSolicitudes();
+    }
+
 
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
@@ -40,6 +68,17 @@ const Perfil = () => {
                     <p><strong>Ciudad:</strong> {userProfile.ciudad || 'No especificado'}</p>
                     <p><strong>Region:</strong> {userProfile.region || 'No especificado'}</p>
                     <p><strong>Calle:</strong> {userProfile.calle || 'No especificado'}</p>
+                </div>
+                <div className="solicitudes-usuario">
+                    <h2>Mis Solicitudes</h2>
+                    <ul>
+                        {solicitudes.map((solicitud) => (
+                            <li key={solicitud._id}>
+                                Producto: {solicitud.producto?.name ?? 'Nombre no disponible'} -
+                                Estado: {solicitud.estado}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
                 <Button onClick={handleOpenModal}>Editar Perfil</Button>
                 <EditProfileModal

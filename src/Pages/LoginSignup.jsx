@@ -66,10 +66,10 @@ const LoginSignup = () => {
             });
             const data = await response.json();
             if (response.ok) {
-                localStorage.setItem('userId', data.userId); // Guardar userId en localStorage
-                navigate('/'); // Redirige a la página principal
+                localStorage.setItem('userId', data.userId);
+                navigate('/');
             } else {
-                setError(data.message); // Establece el mensaje de error
+                setError(data.message);
             }
         } catch (error) {
             console.error("Error en la solicitud de registro", error);

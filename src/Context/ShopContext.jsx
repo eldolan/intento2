@@ -12,14 +12,14 @@ const getDefaultCart = () => {
     return cart;
 };
 
-const formatDate = (date) => {
+/*const formatDate = (date) => {
     const d = new Date(date),
         day = '' + d.getDate(),
         month = '' + (d.getMonth() + 1),
         year = d.getFullYear();
 
     return [day.padStart(2, '0'), month.padStart(2, '0'), year].join('/');
-};
+};*/
 
 const ShopContextProvider = (props) => {
     const [solicitudes, setSolicitudes] = useState([]);
@@ -46,6 +46,7 @@ const ShopContextProvider = (props) => {
     useEffect(() => {
         fetchUserProfile();
         fetchProducts();
+        fetchSolicitudes();
     }, []);
 
     useEffect(() => {
@@ -141,7 +142,42 @@ const ShopContextProvider = (props) => {
         }
     };
 
-
+    const aceptarSolicitud = async (solicitudId) => {
+        try {
+            const response = await fetch(`http://localhost:4000/api/solicitudes/${solicitudId}/aceptar`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (response.ok) {
+                console.log("Solicitud aceptada");
+                fetchSolicitudes();
+            } else {
+                console.error("Error al aceptar solicitud");
+            }
+        } catch (error) {
+            console.error("Error de conexión:", error);
+        }
+    };
+    const rechazarSolicitud = async (solicitudId) => {
+        try {
+            const response = await fetch(`http://localhost:4000/api/solicitudes/${solicitudId}/rechazar`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (response.ok) {
+                console.log("Solicitud rechazada");
+                fetchSolicitudes();
+            } else {
+                console.error("Error al rechazar solicitud");
+            }
+        } catch (error) {
+            console.error("Error de conexión:", error);
+        }
+    };
 
     const addToCart = async (itemId, option, startDate) => {
         const userId = localStorage.getItem('userId');
@@ -187,12 +223,14 @@ const ShopContextProvider = (props) => {
         }
     };
 
-    const fetchSolicitudes = async () => {
+    const fetchSolicitudes = async (userId) => {
         try {
-            const respuesta = await fetch('/api/solicitudes', {
+            const respuesta = await fetch(`http://localhost:4000/api/solicitudes/usuario/${userId}`, {
                 credentials: 'include',
             });
             if (!respuesta.ok) {
+                const body = await respuesta.text();
+                console.error('Respuesta no exitosa:', body);
                 throw new Error('Error al cargar las solicitudes');
             }
             const data = await respuesta.json();
@@ -202,6 +240,28 @@ const ShopContextProvider = (props) => {
         }
     };
 
+
+    const addProduct = async (newProduct) => {
+        try {
+            const response = await axios.post('http://localhost:4000/addproduct', newProduct);
+            if (response.data) {
+                await fetchProducts(); // Actualizar la lista de productos después de agregar uno nuevo
+            }
+        } catch (error) {
+            console.error("Error al añadir producto:", error);
+        }
+    };
+
+    const deleteProduct = async (productId) => {
+        try {
+            const response = await axios.delete(`http://localhost:4000/deleteproduct/${productId}`);
+            if (response.data) {
+                await fetchProducts(); // Actualizar la lista de productos después de eliminar uno
+            }
+        } catch (error) {
+            console.error("Error al eliminar producto:", error);
+        }
+    };
 
 
 
@@ -219,7 +279,11 @@ const ShopContextProvider = (props) => {
         solicitudes,
         isUserAuthenticated,
         setIsUserAuthenticated,
-        updateProfile
+        updateProfile,
+        aceptarSolicitud,
+        rechazarSolicitud,
+        addProduct,
+        deleteProduct
     };
     return (
         <ShopContext.Provider value={contextValue}>

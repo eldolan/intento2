@@ -8,6 +8,39 @@ import {Button} from "react-bootstrap";
 const CartItems = () => {
     const { getTotalCartAmount, products, cartItems, removeFromCart, updateCartQuantity } = useContext(ShopContext);
 
+    const handleCheckout = async () => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            alert("Por favor, inicia sesión para continuar");
+            return;
+        }
+
+        const orderData = {
+            userId: userId,
+            cartItems: cartItems,
+            totalAmount: getTotalCartAmount()
+        };
+
+        try {
+            const response = await fetch('http://localhost:4000/api/crear-solicitud', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            });
+
+            if (response.ok) {
+
+                alert("Pedido creado con éxito");
+            } else {
+                alert("Error al crear el pedido");
+            }
+        } catch (error) {
+            console.error("Error de conexión:", error);
+        }
+    };
+
     return (
         <div className="carrito-container">
             <div className="container mb-5">
@@ -37,7 +70,6 @@ const CartItems = () => {
                                         value={item.quantity}
                                         className="form-control"
                                         onChange={(e) => updateCartQuantity(e.id, parseInt(e.target.value))}
-                                        // Usa la función aquí
                                     />
                                 </div>
                                 <div className="col">${e.new_price * item.quantity}</div>
@@ -71,7 +103,7 @@ const CartItems = () => {
                             <span><strong>Total</strong></span>
                             <span><strong>${getTotalCartAmount()}</strong></span>
                         </div>
-                        <Button href="/checkout" className="btn btn-danger btn-lg w-100 mt-3">Proceder al pago</Button>
+                        <Button onClick={handleCheckout} className="btn btn-danger btn-lg w-100 mt-3">Proceder al pago</Button>
                     </div>
                 </div>
             </div>
